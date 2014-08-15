@@ -33,7 +33,7 @@ class Wachan
         $this->GetArgs();
         $this->ReadConfig();
 
-        $this->wp = new WhatsProt($this->config->get("number"), $this->config->get("id"), $this->config->get("nick"), true);
+        $this->wp = new WhatsProt($this->config->get("number"), $this->config->get("id"), $this->config->get("nick"), false);
 
         // Attempt to connect then login, continue from there
         if($this->Connect())
@@ -213,12 +213,20 @@ class Wachan
             return;
         }
 
+
+
+        var_dump($this->users);
+        echo("\n");
+
         // Broadcast the message across all registered users but make sure to exclude
         // the sender from the queue
         foreach($this->users as $number => $userInfo)
         {
-            if($number != $from)
-                $this->wp->sendMessage($from, "> " . $userInfo['alias'] . "\n\n" . $msg);
+            var_dump($number);
+            var_dump($from);
+
+            if((string) $number != $from)
+                $this->wp->sendMessage($number, "> " . $this->users[$from]['alias'] . "\n\n" . $msg);
         }
     }
 
