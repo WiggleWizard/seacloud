@@ -1,18 +1,25 @@
 <?php
 
 require_once 'libs/WhatsAPI/src/whatsprot.class.php';
-require 'libs/WhatsAPI/src/events/WhatsAppEventListenerBase.php';
+//require 'libs/WhatsAPI/src/events/WhatsAppEventListenerBase.php';
 
 require 'ConfigParser.php';
+require 'CommandMan.php';
 
 class Wachan
 {
+    // --- Object
     var $configPath;
     var $config;
     var $wp;
     var $processNodeBind;
+    var $cmdMan;
     var $lastPongTime = 0; // Unix time
 
+    // --- User
+    var $users = array(); // Holds user information like alias etc
+
+    // --- Fiddles
     var $pongInterval = 20; // In seconds
 
     function __construct()
@@ -36,6 +43,10 @@ class Wachan
         // Bind message recieve so we can parse user input from Whatsapp
         $this->BindMessageRX();
 
+        // Construct a Command Manager
+        $this->cmdMan = new CommandMan($this);
+
+        // Tell the owner that his service is online
         $this->NotifyOwner("-[Wachan]: Service successfully started");
 
         // Entering the main loop here, we are first sending all pooled TX messages
@@ -237,6 +248,13 @@ class ProcessNode
         $from   = explode("@", $node->getAttribute("from"))[0];
 
         echo "- ".$notify." [" . $from . "] @ ".date('H:i').": ".$text."\n";
-        $this->wp->sendMessage($from, "AUTOREPLY");
+
+        $cmdResult = $this->wc->cmdMan->ParseMessage($text, $from);
+
+        if($cmdResult == 0)
+            $this->wp->sendMessage($from, "You sent a normal message");
+        if($cmdResult == 2)
+            $this->wp->sendMessage($from, "Command does not exist");
+
     }
 }
