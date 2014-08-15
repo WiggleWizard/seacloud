@@ -218,7 +218,7 @@ class Wachan
         foreach($this->users as $number => $userInfo)
         {
             if($number != $from)
-                $this->wp->sendMessage($number, "> " . $userInfo['alias'] . "\n\n" . $msg);
+                $this->wp->sendMessage($from, "> " . $userInfo['alias'] . "\n\n" . $msg);
         }
     }
 
