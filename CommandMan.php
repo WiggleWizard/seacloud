@@ -28,7 +28,7 @@ class CommandMan
 
                 $this->wc->users[(string) $from] = array('alias' => $anonName);
             }
-            if($cmd == "alias")
+            else if($cmd == "alias")
             {
 
             }
