@@ -33,7 +33,7 @@ class Wachan
         $this->GetArgs();
         $this->ReadConfig();
 
-        $this->wp = new WhatsProt($this->config->get("number"), $this->config->get("id"), $this->config->get("nick"), false);
+        $this->wp = new WhatsProt($this->config->get("number"), $this->config->get("id"), $this->config->get("nick"), true);
 
         // Attempt to connect then login, continue from there
         if($this->Connect())
@@ -140,7 +140,7 @@ class Wachan
     /**
      * Bind the message recieve event function.
      */
-    function BindMessageRX()
+    private function BindMessageRX()
     {
         $this->processNodeBind = new ProcessNode($this, $this->wp);
         $this->wp->setNewMessageBind($this->processNodeBind);
@@ -204,6 +204,24 @@ class Wachan
         }
     }
 
+    function BroadcastMessage($msg, $from)
+    {
+        // Check if the user has registered, if not then just ignore his ass
+        if(!array_key_exists($from, $this->users))
+        {
+            $this->wp->sendMessage($from, "-[Wachan]: You must !register before you can send or recieve messages on this chan.");
+            return;
+        }
+
+        // Broadcast the message across all registered users but make sure to exclude
+        // the sender from the queue
+        foreach($this->users as $number => $userInfo)
+        {
+            if($number != $from)
+                $this->wp->sendMessage($number, "> " . $userInfo['alias'] . "\n\n" . $msg);
+        }
+    }
+
 
     ///////////////////////
     // LOGGING FUNCTIONS //
@@ -252,7 +270,7 @@ class ProcessNode
         $cmdResult = $this->wc->cmdMan->ParseMessage($text, $from);
 
         if($cmdResult == 0)
-            $this->wp->sendMessage($from, "You sent a normal message");
+            $this->wc->BroadcastMessage($text, $from);
         if($cmdResult == 2)
             $this->wp->sendMessage($from, "Command does not exist");
 

@@ -22,7 +22,10 @@ class CommandMan
 
             if($cmd == "register")
             {
-                $this->wc->wp->sendMessage($from, "You have been registered");
+                $anonName = "Anon#" . rand(0, 100000);
+                $this->wc->wp->sendMessage($from, "-[Wachan]: You have been registered as " . $anonName . ". To change your name use !alias.");
+
+                $this->wc->users[$from] = array('alias' => $anonName);
             }
             else
                 return 2;
