@@ -28,9 +28,9 @@ class CommandMan
         if(substr($str, 0, 1) == $this->directive)
         {
             // We split out the command from the potential parameters.
-            $cmdEnd = strpos($str, " ") - 1;
-            $cmdEnd = ($cmdEnd == false ? strlen($str) - 1 : $cmdEnd);
-            $cmd    = substr($str, 1, $cmdEnd);
+            $cmdLen = strpos($str, " ");
+            $cmdLen = ($cmdLen == false ? strlen($str) - 1 : $cmdLen - 1);
+            $cmd    = substr($str, 1, $cmdLen);
 
             // Do a loop through all the registered commands and find the suitable one
             // to execute.
@@ -50,22 +50,6 @@ class CommandMan
             }
 
             return 2; // No such command
-
-            // if($cmd == "register")
-            // {
-            //     $anonName = "Anon#" . rand(0, 100000);
-            //     $this->wc->wp->sendMessage($from, "-[Wachan]: You have been registered as " . $anonName . ". To change your name use !alias.");
-            //
-            //     $this->wc->users[(string) $from] = array('alias' => $anonName);
-            // }
-            // else if($cmd == "alias")
-            // {
-            //
-            // }
-            // else
-            //     return 2;
-            //
-            // return 1;
         }
         else
             return 0; // Not even a command
