@@ -5,6 +5,7 @@ require_once 'libs/WhatsAPI/src/whatsprot.class.php';
 
 require 'ConfigParser.php';
 require 'CommandMan.php';
+require 'Commands.php';
 
 class Wachan
 {
@@ -14,6 +15,7 @@ class Wachan
     var $wp;
     var $processNodeBind;
     var $cmdMan;
+    var $commands;
     var $lastPongTime = 0; // Unix time
 
     // --- User
@@ -44,7 +46,8 @@ class Wachan
         $this->BindMessageRX();
 
         // Construct a Command Manager
-        $this->cmdMan = new CommandMan($this);
+        $this->commands = new Commands($this);
+        $this->cmdMan   = new CommandMan($this, $this->commands);
 
         // Tell the owner that his service is online
         $this->NotifyOwner("-[Wachan]: Service successfully started");
