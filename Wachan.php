@@ -207,7 +207,7 @@ class Wachan
         }
     }
 
-    function BroadcastMessage($msg, $from)
+    function BroadcastMessageFrom($msg, $from)
     {
         // Check if the user has registered, if not then just ignore his ass
         if(!array_key_exists($from, $this->users))
@@ -216,21 +216,54 @@ class Wachan
             return;
         }
 
-
-
-        var_dump($this->users);
-        echo("\n");
-
         // Broadcast the message across all registered users but make sure to exclude
         // the sender from the queue
         foreach($this->users as $number => $userInfo)
         {
-            var_dump($number);
-            var_dump($from);
-
-            if((string) $number != $from)
+            if($number != $from)
                 $this->wp->sendMessage($number, "> " . $this->users[$from]['alias'] . "\n\n" . $msg);
         }
+    }
+
+    /**
+     * Broadcasts a message to every user and excludes the numbers in the $excl array.
+     *
+     * @param [type] $msg  [description]
+     * @param [type] $excl [description]
+     */
+    function BroadcastSystemMessageExcl($msg, $excl = array())
+    {
+        foreach($this->users as $number => $userInfo)
+        {
+            if(!in_array($number, $excl))
+                $this->wp->sendMessage($number, "-[Wachan]: " . $msg);
+        }
+    }
+
+    /**
+     * Handles the system wide prepend to the system messages (for consistency).
+     *
+     * @param [type] $msg [description]
+     */
+    function SendSystemMessageTo($msg, $to)
+    {
+        $this->wp->sendMessage($to, "-[Wachan]: " . $msg);
+    }
+
+    /**
+     * Checks if a user is registered in the users array.
+     *
+     * @param string/int $number The number to be checked
+     */
+    function IsRegistered($number)
+    {
+        foreach($this->users as $registeredNo => $userInfo)
+        {
+            if($registeredNo == $number)
+                return true;
+        }
+
+        return false;
     }
 
 
@@ -281,7 +314,7 @@ class ProcessNode
         $cmdResult = $this->wc->cmdMan->ParseMessage($text, $from);
 
         if($cmdResult == 0)
-            $this->wc->BroadcastMessage($text, $from);
+            $this->wc->BroadcastMessageFrom($text, $from);
         if($cmdResult == 2)
             $this->wp->sendMessage($from, "Command does not exist");
 
