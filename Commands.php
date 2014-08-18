@@ -12,6 +12,7 @@ class Commands
         $this->RegisterCommand("join", "Join", 0);
         $this->RegisterCommand("ping", "Ping", 0);
         $this->RegisterCommand("alias", "Alias", 1);
+        $this->RegisterCommand("invite", "Invite", 2);
     }
 
     function GetCommands()
@@ -51,6 +52,18 @@ class Commands
         $this->wc->SendSystemMessageTo("Your alias has been changed to ".$params[1], $from);
 
         $this->wc->BroadcastSystemMessageExcl($oldName . " has changed his name to " . $params[1], array($from));
+    }
+
+    function Invite($wc, $from, $params)
+    {
+        if(sizeof($params) > 2)
+        {
+
+        }
+        else
+        {
+            $this->wc->SendSystemMessageTo("Usage: .invite <number> <message>", $from);
+        }
     }
 
     /**
