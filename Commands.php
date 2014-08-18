@@ -9,7 +9,7 @@ class Commands
     {
         $this->wc = $wc;
 
-        $this->RegisterCommand("register", "Register", 0);
+        $this->RegisterCommand("join", "Join", 0);
         $this->RegisterCommand("ping", "Ping", 0);
         $this->RegisterCommand("alias", "Alias", 1);
     }
@@ -19,10 +19,10 @@ class Commands
         return $this->commands;
     }
 
-    function Register($wc, $from, $params)
+    function Join($wc, $from, $params)
     {
         $anonName = "Anon#" . rand(0, 100000);
-        $this->wc->SendSystemMessageTo("You have been registered as " . $anonName . ". To change your name use .alias", $from);
+        $this->wc->SendSystemMessageTo("You have joined as " . $anonName . ". To change your name use .alias", $from);
 
         // Insert the user into the 'registered' users array
         $this->wc->users[(string) $from] = array('alias' => $anonName);
@@ -38,6 +38,13 @@ class Commands
 
     function Alias($wc, $from, $params)
     {
+        // Check to see if it's a valid name or not
+        if($params[1] == "")
+        {
+            $this->wc->SendSystemMessageTo("Illegal name", $from);
+            return false;
+        }
+
         $oldName = $this->wc->users[$from]['alias'];
 
         $this->wc->users[$from]['alias'] = $params[1];

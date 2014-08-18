@@ -209,14 +209,14 @@ class Wachan
 
     function BroadcastMessageFrom($msg, $from)
     {
-        // Check if the user has registered, if not then just ignore his ass
+        // Check if the user has joined, if not then just ignore his ass
         if(!array_key_exists($from, $this->users))
         {
-            $this->wp->sendMessage($from, "*** Wachan ***\nYou must .register before you can send or recieve messages on this chan");
+            $this->wp->sendMessage($from, "*** Wachan ***\nYou must .join before you can send or recieve messages on this chan");
             return;
         }
 
-        // Broadcast the message across all registered users but make sure to exclude
+        // Broadcast the message across all joined users but make sure to exclude
         // the sender from the queue
         foreach($this->users as $number => $userInfo)
         {
@@ -251,15 +251,15 @@ class Wachan
     }
 
     /**
-     * Checks if a user is registered in the users array.
+     * Checks if a user is joined in the users array.
      *
      * @param string/int $number The number to be checked
      */
-    function IsRegistered($number)
+    function IsJoined($number)
     {
-        foreach($this->users as $registeredNo => $userInfo)
+        foreach($this->users as $joinedNo => $userInfo)
         {
-            if($registeredNo == $number)
+            if($joinedNo == $number)
                 return true;
         }
 
