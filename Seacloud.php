@@ -51,6 +51,7 @@ class Seacloud
 
         // Tell the owner that his service is online
         $this->NotifyOp("*** Seacloud ***\nService successfully started");
+        $this->SetStatus("Seacloud chat service. Use .join to join the channel.");
 
         // Entering the main loop here, we are first sending all pooled TX messages
         // using pollMessage() and then we are asking to pool RX messages with

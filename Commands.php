@@ -58,7 +58,11 @@ class Commands
     {
         if(sizeof($params) > 2)
         {
+            $this->wc->SendSystemMessageTo("You have been invited to chat on Seacloud by "
+            . $this->sc->users['from']['alias'] .
+            ". To join just type .join", $params[1]);
 
+            $this->wc->SendSystemMessageTo("You have sent an invite to " . $params[1], $from);
         }
         else
         {
