@@ -13,6 +13,7 @@ class Commands
         $this->RegisterCommand("ping", "Ping", 0);
         $this->RegisterCommand("alias", "Alias", 1);
         $this->RegisterCommand("invite", "Invite", 2);
+        $this->RegisterCommand("list", "ListUsers", 0); $this->RegisterCommand("online", "ListUsers", 0);
     }
 
     function GetCommands()
@@ -28,13 +29,13 @@ class Commands
         // Insert the user into the 'registered' users array
         $this->wc->users[(string) $from] = array('alias' => $anonName);
 
-        // Breadcast the registration across the chan
+        // Breadcast the registration across the channel but exclude the person who joined
         $this->wc->BroadcastSystemMessageExcl($anonName . " has joined the channel", array($from));
     }
 
     function Ping($sc, $from, $params)
     {
-        $sc->wp->sendMessage($from, "Pong");
+        $sc->SendSystemMessageTo("Pong", $from);
     }
 
     function Alias($sc, $from, $params)
@@ -56,7 +57,7 @@ class Commands
 
     function Invite($sc, $from, $params)
     {
-        if(sizeof($params) > 2)
+        if(sizeof($params) == 2)
         {
             $this->wc->SendSystemMessageTo("You have been invited to chat on Seacloud by "
             . $this->sc->users['from']['alias'] .
@@ -66,8 +67,20 @@ class Commands
         }
         else
         {
-            $this->wc->SendSystemMessageTo("Usage: .invite <number> <message>", $from);
+            $this->wc->SendSystemMessageTo("Usage: .invite <number>", $from);
         }
+    }
+
+    function ListUsers($sc, $from, $params)
+    {
+        $online = "";
+
+        foreach($sc->users as $user)
+        {
+            $online .= $user['alias'] . ", ";
+        }
+
+        $sc->SendSystemMessageTo("Online: " . $online, $from);
     }
 
     /**

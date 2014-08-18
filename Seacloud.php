@@ -17,6 +17,7 @@ class Seacloud
     var $cmdMan;
     var $commands;
     var $lastPongTime = 0; // Unix time
+    var $poolingOffline = false; // Triggered when pooling offline messages
 
     // --- User
     var $users = array(); // Holds user information like alias etc
@@ -48,6 +49,13 @@ class Seacloud
         // Construct a Command Manager
         $this->commands = new Commands($this);
         $this->cmdMan   = new CommandMan($this, $this->commands);
+
+        // Pool offline messages before opening up service
+        $this->Log("Unpooling offline messages");
+        $this->poolingOffline = true;
+        while($this->wp->pollMessage());
+        $this->poolingOffline = false;
+        $this->Log("Done unpooling offline messages");
 
         // Tell the owner that his service is online
         $this->NotifyOp("*** Seacloud ***\nService successfully started");
@@ -199,7 +207,6 @@ class Seacloud
             foreach($this->config->GetArray("owner") as $owner)
             {
                 $this->wp->sendMessage($owner, $str);
-                while($this->wp->pollMessage());
             }
         }
     }
@@ -217,7 +224,7 @@ class Seacloud
         // Check if the user has joined, if not then just ignore his ass
         if(!array_key_exists($from, $this->users))
         {
-            $this->wp->sendMessage($from, "*** Seacloud ***\nYou must .join before you can send or recieve messages on this chan");
+            $this->wp->sendMessage($from, "*** Seacloud ***\nYou must .join before you can send or recieve messages on this Seacloud");
             return;
         }
 
@@ -313,19 +320,24 @@ class ProcessNode
     public function process($node)
     {
         // Get the text from the message
-        $text   = $node->getChild('body');
-        $text   = $text->getData();
-        $notify = $node->getAttribute("notify");
-        $from   = explode("@", $node->getAttribute("from"))[0];
+        $text    = $node->getChild('body');
+        $text    = $text->getData();
+        $msgTime = intval($node->getAttribute('t'));
+        $waName  = $node->getAttribute("notify");
+        $from    = explode("@", $node->getAttribute("from"))[0];
 
-        echo "- ".$notify." [" . $from . "] @ ".date('H:i').": ".$text."\n";
+        echo "- ".$waName." [" . $from . "] @ ".date('H:i').": ".$text."\n";
 
-        $cmdResult = $this->sc->cmdMan->ParseMessage($text, $from);
+        // Drop messages that were sent when the service was offline
+        if(!$this->sc->poolingOffline)
+        {
+            $cmdResult = $this->sc->cmdMan->ParseMessage($text, $from);
 
-        if($cmdResult == 0)
-            $this->sc->BroadcastMessageFrom($text, $from);
-        if($cmdResult == 2)
-            $this->wp->sendMessage($from, "Command does not exist");
+            if($cmdResult == 0)
+                $this->sc->BroadcastMessageFrom($text, $from);
+            if($cmdResult == 2)
+                $this->wp->sendMessage($from, "Command does not exist");
+        }
 
     }
 }
