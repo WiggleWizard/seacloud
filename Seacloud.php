@@ -43,8 +43,8 @@ class Seacloud
             if(!$this->Login())
                 exit();
 
-        // Bind message recieve so we can parse user input from Whatsapp
-        $this->BindMessageRX();
+        // Bind events
+        $this->CommitBinds();
 
         // Construct a Command Manager
         $this->commands = new Commands($this);
@@ -150,12 +150,12 @@ class Seacloud
     }
 
     /**
-     * Bind the message recieve event function.
+     * Hooks into the events of WhatsAPI.
      */
-    private function BindMessageRX()
+    private function CommitBinds()
     {
-        $this->processNodeBind = new ProcessNode($this, $this->wp);
-        $this->wp->setNewMessageBind($this->processNodeBind);
+        $this->wp->eventManager()->bind("onGetMessage", array($this, "OnMessageRx"));
+        $this->wp->eventManager()->bind("onGetImage", array($this, "OnImageRx"));
     }
 
     /**
@@ -191,9 +191,9 @@ class Seacloud
     }
 
 
-    ////////////////
-    // FUNCTIONAL //
-    ////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // FUNCTIONAL //////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Messages all the owners of the service on Whatsapp.
@@ -283,9 +283,9 @@ class Seacloud
     }
 
 
-    ///////////////////////
-    // LOGGING FUNCTIONS //
-    ///////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // LOGGING FUNCTIONS ///////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
 
     function Log($str)
     {
@@ -301,43 +301,58 @@ class Seacloud
     {
         echo("[\e[31m-\033[0m] " . $str . "\n");
     }
-}
 
-$wc = new Seacloud();
-$wc->Begin();
 
-class ProcessNode
-{
-    protected $wp = false; // WhatsAPI object
-    protected $sc = false; // Seacloud object
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // BINDINGS //////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public function __construct($sc, $wp)
+    function OnImageRx(
+        $phone, // The user phone number including the country code.
+        $from, // The sender JID.
+        $msgid, // The message id.
+        $type, // The message type.
+        $time, // The unix time when send message notification.
+        $name, // The sender name.
+        $size, // The image size.
+        $url, // The url to bigger image version.
+        $file, // The image name.
+        $mimetype, // The image mime type.
+        $filehash, // The image file hash.
+        $width, // The image width.
+        $height, // The image height.
+        $thumbnail // The base64_encode image thumbnail.
+    )
     {
-        $this->wp = $wp;
-        $this->sc = $sc;
+        echo("RX image: $url\n");
     }
 
-    public function process($node)
+    function OnMessageRx(
+        $phone, // The user phone number including the country code.
+        $from, // The sender JID.
+        $msgid, // The message id.
+        $type, // The message type.
+        $time, // The unix time when send message notification.
+        $name, // The sender name.
+        $message // The message.
+    )
     {
-        // Get the text from the message
-        $text    = $node->getChild('body');
-        $text    = $text->getData();
-        $msgTime = intval($node->getAttribute('t'));
-        $waName  = $node->getAttribute("notify");
-        $from    = explode("@", $node->getAttribute("from"))[0];
+        $from = explode("@", $from)[0];
 
-        echo "- ".$waName." [" . $from . "] @ ".date('H:i').": ".$text."\n";
+        echo "- ".$name." [" . $from . "] @ ".date('H:i').": ".$message."\n";
 
         // Drop messages that were sent when the service was offline
-        if(!$this->sc->poolingOffline)
+        if(!$this->poolingOffline)
         {
-            $cmdResult = $this->sc->cmdMan->ParseMessage($text, $from);
+            $cmdResult = $this->cmdMan->ParseMessage($message, $from);
 
             if($cmdResult == 0)
-                $this->sc->BroadcastMessageFrom($text, $from);
+                $this->BroadcastMessageFrom($message, $from);
             if($cmdResult == 2)
                 $this->wp->sendMessage($from, "Command does not exist");
         }
-
     }
 }
+
+$sc = new Seacloud();
+$sc->Begin();
