@@ -35,7 +35,7 @@ class Wachan
         $this->GetArgs();
         $this->ReadConfig();
 
-        $this->wp = new WhatsProt($this->config->get("number"), $this->config->get("id"), $this->config->get("nick"), false);
+        $this->wp = new WhatsProt($this->config->Get("number"), $this->config->Get("id"), $this->config->Get("nick"), false);
 
         // Attempt to connect then login, continue from there
         if($this->Connect())
@@ -50,7 +50,7 @@ class Wachan
         $this->cmdMan   = new CommandMan($this, $this->commands);
 
         // Tell the owner that his service is online
-        $this->NotifyOwner("*** Wachan ***\nService successfully started");
+        $this->NotifyOp("*** Wachan ***\nService successfully started");
 
         // Entering the main loop here, we are first sending all pooled TX messages
         // using pollMessage() and then we are asking to pool RX messages with
@@ -109,11 +109,11 @@ class Wachan
      */
     private function Login()
     {
-        $this->Log("Logging in on " . $this->config->get("number"));
+        $this->Log("Logging in on " . $this->config->Get("number"));
 
         try
         {
-            $this->wp->loginWithPassword($this->config->get("pass"));
+            $this->wp->loginWithPassword($this->config->Get("pass"));
         }
         catch(Exception $e)
         {
@@ -187,15 +187,19 @@ class Wachan
     ////////////////
 
     /**
-     * Messages the owner of the service on Whatsapp.
+     * Messages all the owners of the service on Whatsapp.
      */
-    function NotifyOwner($str)
+    function NotifyOp($str)
     {
         if($this->wp)
         {
-            $this->Log("Telling owner: " . $str);
-            $this->wp->sendMessage($this->config->get("owner"), $str);
-            while($this->wp->pollMessage());
+            $this->Log("Telling owners: " . $str);
+
+            foreach($this->config->GetArray("owner") as $owner)
+            {
+                $this->wp->sendMessage($owner, $str);
+                while($this->wp->pollMessage());
+            }
         }
     }
 
@@ -264,6 +268,10 @@ class Wachan
         }
 
         return false;
+    }
+
+    function IsOp($number)
+    {
     }
 
 

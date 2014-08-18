@@ -20,9 +20,14 @@ class ConfigParser
 		fclose($fs);
 	}
 
-	function get($key)
+	function Get($key)
 	{
 		return $this->config[$key];
+	}
+
+	function GetArray($key)
+	{
+		return explode(",", $this->Get($key));
 	}
 }
 
