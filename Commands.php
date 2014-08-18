@@ -22,7 +22,7 @@ class Commands
     function Register($wc, $from, $params)
     {
         $anonName = "Anon#" . rand(0, 100000);
-        $this->wc->SendSystemMessageTo("You have been registered as " . $anonName . ". To change your name use !alias.", $from);
+        $this->wc->SendSystemMessageTo("You have been registered as " . $anonName . ". To change your name use .alias", $from);
 
         // Insert the user into the 'registered' users array
         $this->wc->users[(string) $from] = array('alias' => $anonName);

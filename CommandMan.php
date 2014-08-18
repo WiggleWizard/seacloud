@@ -5,7 +5,7 @@ class CommandMan
     protected $wc       = null;
     protected $commands = null;
 
-    var $directive = "!";
+    var $directive = ".";
 
     function __construct($wc, $commands)
     {

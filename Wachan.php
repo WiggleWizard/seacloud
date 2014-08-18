@@ -50,7 +50,7 @@ class Wachan
         $this->cmdMan   = new CommandMan($this, $this->commands);
 
         // Tell the owner that his service is online
-        $this->NotifyOwner("-[Wachan]: Service successfully started");
+        $this->NotifyOwner("*** Wachan ***\nService successfully started");
 
         // Entering the main loop here, we are first sending all pooled TX messages
         // using pollMessage() and then we are asking to pool RX messages with
@@ -212,7 +212,7 @@ class Wachan
         // Check if the user has registered, if not then just ignore his ass
         if(!array_key_exists($from, $this->users))
         {
-            $this->wp->sendMessage($from, "-[Wachan]: You must !register before you can send or recieve messages on this chan.");
+            $this->wp->sendMessage($from, "*** Wachan ***\nYou must .register before you can send or recieve messages on this chan");
             return;
         }
 
@@ -221,7 +221,7 @@ class Wachan
         foreach($this->users as $number => $userInfo)
         {
             if($number != $from)
-                $this->wp->sendMessage($number, "> " . $this->users[$from]['alias'] . "\n\n" . $msg);
+                $this->wp->sendMessage($number, "<" . $this->users[$from]['alias'] . ">\n" . $msg);
         }
     }
 
@@ -236,7 +236,7 @@ class Wachan
         foreach($this->users as $number => $userInfo)
         {
             if(!in_array($number, $excl))
-                $this->wp->sendMessage($number, "-[Wachan]: " . $msg);
+                $this->wp->sendMessage($number, "*** Wachan ***\n" . $msg);
         }
     }
 
@@ -247,7 +247,7 @@ class Wachan
      */
     function SendSystemMessageTo($msg, $to)
     {
-        $this->wp->sendMessage($to, "-[Wachan]: " . $msg);
+        $this->wp->sendMessage($to, "*** Wachan ***\n" . $msg);
     }
 
     /**
