@@ -7,7 +7,7 @@ require 'ConfigParser.php';
 require 'CommandMan.php';
 require 'Commands.php';
 
-class Wachan
+class Seacloud
 {
     // --- Object
     var $configPath;
@@ -50,7 +50,7 @@ class Wachan
         $this->cmdMan   = new CommandMan($this, $this->commands);
 
         // Tell the owner that his service is online
-        $this->NotifyOp("*** Wachan ***\nService successfully started");
+        $this->NotifyOp("*** Seacloud ***\nService successfully started");
 
         // Entering the main loop here, we are first sending all pooled TX messages
         // using pollMessage() and then we are asking to pool RX messages with
@@ -216,7 +216,7 @@ class Wachan
         // Check if the user has joined, if not then just ignore his ass
         if(!array_key_exists($from, $this->users))
         {
-            $this->wp->sendMessage($from, "*** Wachan ***\nYou must .join before you can send or recieve messages on this chan");
+            $this->wp->sendMessage($from, "*** Seacloud ***\nYou must .join before you can send or recieve messages on this chan");
             return;
         }
 
@@ -240,7 +240,7 @@ class Wachan
         foreach($this->users as $number => $userInfo)
         {
             if(!in_array($number, $excl))
-                $this->wp->sendMessage($number, "*** Wachan ***\n" . $msg);
+                $this->wp->sendMessage($number, "*** Seacloud ***\n" . $msg);
         }
     }
 
@@ -251,7 +251,7 @@ class Wachan
      */
     function SendSystemMessageTo($msg, $to)
     {
-        $this->wp->sendMessage($to, "*** Wachan ***\n" . $msg);
+        $this->wp->sendMessage($to, "*** Seacloud ***\n" . $msg);
     }
 
     /**
@@ -295,18 +295,18 @@ class Wachan
     }
 }
 
-$wc = new Wachan();
+$wc = new Seacloud();
 $wc->Begin();
 
 class ProcessNode
 {
     protected $wp = false; // WhatsAPI object
-    protected $wc = false; // Wachan object
+    protected $sc = false; // Seacloud object
 
-    public function __construct($wc, $wp)
+    public function __construct($sc, $wp)
     {
         $this->wp = $wp;
-        $this->wc = $wc;
+        $this->sc = $sc;
     }
 
     public function process($node)
@@ -319,10 +319,10 @@ class ProcessNode
 
         echo "- ".$notify." [" . $from . "] @ ".date('H:i').": ".$text."\n";
 
-        $cmdResult = $this->wc->cmdMan->ParseMessage($text, $from);
+        $cmdResult = $this->sc->cmdMan->ParseMessage($text, $from);
 
         if($cmdResult == 0)
-            $this->wc->BroadcastMessageFrom($text, $from);
+            $this->sc->BroadcastMessageFrom($text, $from);
         if($cmdResult == 2)
             $this->wp->sendMessage($from, "Command does not exist");
 

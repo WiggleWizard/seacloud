@@ -2,14 +2,14 @@
 
 class CommandMan
 {
-    protected $wc       = null;
+    protected $sc       = null;
     protected $commands = null;
 
     var $directive = ".";
 
-    function __construct($wc, $commands)
+    function __construct($sc, $commands)
     {
-        $this->wc       = $wc;
+        $this->wc       = $sc;
         $this->commands = $commands;
 
         $this->wc->Log("Command Manager online");

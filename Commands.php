@@ -2,12 +2,12 @@
 
 class Commands
 {
-    var $wc;
+    var $sc;
     var $commands = array(); // Array of all registered commands
 
-    function __construct($wc)
+    function __construct($sc)
     {
-        $this->wc = $wc;
+        $this->wc = $sc;
 
         $this->RegisterCommand("join", "Join", 0);
         $this->RegisterCommand("ping", "Ping", 0);
@@ -20,7 +20,7 @@ class Commands
         return $this->commands;
     }
 
-    function Join($wc, $from, $params)
+    function Join($sc, $from, $params)
     {
         $anonName = "Anon#" . rand(0, 100000);
         $this->wc->SendSystemMessageTo("You have joined as " . $anonName . ". To change your name use .alias", $from);
@@ -32,12 +32,12 @@ class Commands
         $this->wc->BroadcastSystemMessageExcl($anonName . " has joined the channel", array($from));
     }
 
-    function Ping($wc, $from, $params)
+    function Ping($sc, $from, $params)
     {
-        $wc->wp->sendMessage($from, "Pong");
+        $sc->wp->sendMessage($from, "Pong");
     }
 
-    function Alias($wc, $from, $params)
+    function Alias($sc, $from, $params)
     {
         // Check to see if it's a valid name or not
         if($params[1] == "")
@@ -54,7 +54,7 @@ class Commands
         $this->wc->BroadcastSystemMessageExcl($oldName . " has changed his name to " . $params[1], array($from));
     }
 
-    function Invite($wc, $from, $params)
+    function Invite($sc, $from, $params)
     {
         if(sizeof($params) > 2)
         {
