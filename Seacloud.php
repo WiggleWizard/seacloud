@@ -339,7 +339,7 @@ class Seacloud
         {
             if($number != $from)
             {
-                $this->wp->sendMessageImage($from, $url, false, $size, $filehash);
+                $this->wp->sendMessageImage($number, $url, false, $size, $filehash);
                 $this->wp->sendMessage($number, $this->users[$from]['alias'] . " sent an image");
             }
         }
