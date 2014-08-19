@@ -35,3 +35,6 @@ You first need a side contact, aka: a contact number that you own, but are not a
 Sure you can, Seacloud was originally designed to be an anonymous chat channel, but also serves as an example code base for developers who would like to design/code a Whatsapp bot/service.
 
 It is frowned upon though to modify the code base maliciously and still pass as a Seacloud service.
+
+###Is there some sort of demo?
+There is a development demo that's up sometimes (It will be up permanently once the project has reached a point in development where persistence is not an issue). You can demo it on this number: `+447745940363`
