@@ -17,6 +17,7 @@ class Seacloud
     var $cmdMan;
     var $commands;
     var $lastPongTime = 0; // Unix time
+    var $lastPersistTime = 0; // Last time data was saved to persistence
     var $poolingOffline = false; // Triggered when pooling offline messages
 
     // --- User
@@ -24,6 +25,8 @@ class Seacloud
 
     // --- Fiddles
     var $pongInterval = 20; // In seconds
+    var $persist = true; // Persistence means that when the service goes down it's in the same state as when it was up
+    var $persistenceInterval = 10; // The amount of seconds between each persistent save to flat file
 
     function __construct()
     {
@@ -61,6 +64,9 @@ class Seacloud
         $this->NotifyOp("*** Seacloud ***\nService successfully started");
         $this->SetStatus("Seacloud chat service. Use .join to join the channel.");
 
+        // Load persisted data
+        $this->LoadPersistedData();
+
         // Entering the main loop here, we are first sending all pooled TX messages
         // using pollMessage() and then we are asking to pool RX messages with
         // getMessages().
@@ -87,7 +93,39 @@ class Seacloud
                 $this->wp->sendPong(rand(0, 10000));
                 $this->lastPongTime = time();
             }
+
+            // Persist data if enabled
+            if($this->lastPersistTime == 0 || time() - $this->persistenceInterval >= $this->lastPersistTime)
+            {
+                if($this->persist)
+                {
+                    $this->SavePersistentData();
+                    $this->lastPersistTime = time();
+                }
+            }
         }
+    }
+
+    /**
+     * Load persistent data from the persistence file
+     */
+    private function LoadPersistedData()
+    {
+        if(file_exists("persistence.dat"))
+        {
+            $s = file_get_contents("persistence.dat");
+            $this->users = unserialize($s);
+        }
+        else
+            $this->LogWarn("No persistence data found");
+    }
+
+    /**
+     * Save data into a persistence file
+     */
+    private function SavePersistentData()
+    {
+        file_put_contents("persistence.dat", serialize($this->users));
     }
 
     /**
