@@ -4,6 +4,26 @@ Seacloud is a Whatsapp bot that creates a chat channel through a Whatsapp contac
 
 In short it's kinda like IRC where you can join the channel and your actual number will never be known and you can take any identity you fancy; anonymously.
 
+Running a Seacloud service
+==========================
+To run a Seacloud service you must have your contact number ready along with the password. Once you have that, create a `config.wcfg` file. Then start the Seacloud service by using `php Seacloud.php -c config.wcfg`. Details about making a `wcfg` file are below.
+
+Seacloud configs
+================
+Seacloud requires a config to be made and referred to at runtime in order to both correctly separate authentication and make life easier when wanting to use different contacts for different services.
+
+An example config:
+```
+number=123456789
+pass=passwordhash
+id=999
+nick=Seacloud
+owner=123456789
+```
+Where number is the number of the contact you will be using as the Seacloud interaction point and owner is your own personal number. Owner number is used to tell the service owner whether the service has been started correctly and to communicate any (future) errors.
+
+As a developer you can add more entries and refer to them in code by using the provided `ConfigParser` instance in the `Seacloud` object.
+
 ---
 FAQ
 ===
