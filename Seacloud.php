@@ -324,7 +324,26 @@ class Seacloud
         $thumbnail // The base64_encode image thumbnail.
     )
     {
-        echo("RX image: $url\n");
+        $from = explode("@", $from)[0];
+
+        // Check if the user has joined, if not then just ignore his ass
+        if(!array_key_exists($from, $this->users))
+        {
+            $this->wp->sendMessage($from, "*** Seacloud ***\nYou must .join before you can send or recieve messages on this Seacloud");
+            return;
+        }
+
+        // Broadcast the message across all joined users but make sure to exclude
+        // the sender from the queue
+        foreach($this->users as $number => $userInfo)
+        {
+            if($number != $from)
+            {
+                $this->wp->sendMessageImage($from, $url, false, $size, $filehash);
+                $this->wp->sendMessage($number, $this->users[$from]['alias'] . " sent an image");
+            }
+        }
+
     }
 
     function OnMessageRx(
