@@ -8,6 +8,8 @@ Running a Seacloud service
 ==========================
 To run a Seacloud service you must have your contact number ready along with the password. Once you have that, create a `config.wcfg` file. Then start the Seacloud service by using `php Seacloud.php -c config.wcfg`. Details about making a `wcfg` file are below.
 
+Do note that even though Seacloud uses encryption techniques to encrypt the persistence data, it is not required that you have mcrypt installed. However having mcrypt installed and enabled will certainly speed the encryption process up.
+
 Seacloud configs
 ================
 Seacloud requires a config to be made and referred to at runtime in order to both correctly separate authentication and make life easier when wanting to use different contacts for different services.
@@ -19,6 +21,7 @@ pass=passwordhash
 id=999
 nick=Seacloud
 owner=123456789
+persistencekey=random
 ```
 Where number is the number of the contact you will be using as the Seacloud interaction point and owner is your own personal number. Owner number is used to tell the service owner whether the service has been started correctly and to communicate any (future) errors.
 
