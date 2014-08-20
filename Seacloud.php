@@ -433,8 +433,14 @@ class Seacloud
         {
             $cmdResult = $this->cmdMan->ParseMessage($message, $from);
 
+            // If it truely wasn't a command intent
             if($cmdResult == 0)
-                $this->BroadcastMessageFrom($message, $from);
+            {
+                if(!$this->IsAfk($from))
+                    $this->BroadcastMessageFrom($message, $from);
+                else
+                    $this->SendSystemMessageTo("You cannot send a message while AFK. Use .afk to renable channel chat", $from);
+            }
             if($cmdResult == 2)
                 $this->wp->sendMessage($from, "Command does not exist");
         }
