@@ -15,6 +15,7 @@ class Commands
         $this->RegisterCommand("invite", "Invite", 1);
         $this->RegisterCommand("list", "ListUsers", 0); $this->RegisterCommand("online", "ListUsers", 0);
         $this->RegisterCommand("afk", "Afk", 0);
+        $this->RegisterCommand("leave", "Leave", 0);
     }
 
     function GetCommands()
@@ -107,6 +108,20 @@ class Commands
         $sc->SendSystemMessageTo("You have gone afk", $from);
 
         $sc->BroadcastSystemMessageExcl($sc->users[$from]['alias'] . " has gone afk", array($from));
+    }
+
+    function Leave($sc, $from, $params)
+    {
+        if($sc->IsJoined($from))
+        {
+            // We kinda cheating here by broadcasting the message first, but hey, no one will know ;)
+            $sc->BroadcastSystemMessageExcl($sc->users[$from] . " has left the channel", array($from));
+            unset($sc->users[$from]);
+        }
+        else
+        {
+            $sc->SendSystemMessageTo("You cannot leave a channel that you are not connected to", $from);
+        }
     }
 
     /**
