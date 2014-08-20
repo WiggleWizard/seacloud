@@ -1,6 +1,7 @@
 <?php
 
 require_once 'libs/WhatsAPI/src/whatsprot.class.php';
+require_once 'libs/phpseclib/phpseclib/Crypt/AES.php';
 //require 'libs/WhatsAPI/src/events/WhatsAppEventListenerBase.php';
 
 require 'ConfigParser.php';
@@ -14,6 +15,7 @@ class Seacloud
     var $config;
     var $wp;
     var $processNodeBind;
+    var $cipher; // Used to encrypt the persistence file
     var $cmdMan;
     var $commands;
     var $lastPongTime = 0; // Unix time
@@ -64,6 +66,9 @@ class Seacloud
         $this->NotifyOp("*** Seacloud ***\nService successfully started");
         $this->SetStatus("Seacloud chat service. Use .join to join the channel.");
 
+        $this->cipher = new Crypt_AES(CRYPT_AES_MODE_ECB);
+        $this->cipher->setKey($this->config->Get('persistencekey'));
+
         // Load persisted data
         $this->LoadPersistedData();
 
@@ -113,8 +118,11 @@ class Seacloud
     {
         if(file_exists("persistence.dat"))
         {
-            $s = file_get_contents("persistence.dat");
-            $this->users = unserialize($s);
+            // Get the contents and decrypt it
+            $s  = file_get_contents("persistence.dat");
+            $ds = $this->cipher->decrypt($s);
+
+            $this->users = unserialize($ds);
         }
         else
             $this->LogWarn("No persistence data found");
@@ -125,7 +133,9 @@ class Seacloud
      */
     private function SavePersistentData()
     {
-        file_put_contents("persistence.dat", serialize($this->users));
+        // Encrypt the data when writing
+        $es = $this->cipher->encrypt(serialize($this->users));
+        file_put_contents("persistence.dat", $es);
     }
 
     /**
