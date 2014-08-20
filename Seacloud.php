@@ -257,6 +257,11 @@ class Seacloud
         }
     }
 
+    /**
+     * This is the standard
+     * @param [type] $msg  [description]
+     * @param [type] $from [description]
+     */
     function BroadcastMessageFrom($msg, $from)
     {
         // Check if the user has joined, if not then just ignore his ass
@@ -270,7 +275,7 @@ class Seacloud
         // the sender from the queue
         foreach($this->users as $number => $userInfo)
         {
-            if($number != $from)
+            if($number != $from && !$this->IsAfk($number))
                 $this->wp->sendMessage($number, "<" . $this->users[$from]['alias'] . ">\n" . $msg);
         }
     }
@@ -285,7 +290,7 @@ class Seacloud
     {
         foreach($this->users as $number => $userInfo)
         {
-            if(!in_array($number, $excl))
+            if(!in_array($number, $excl) && !$this->IsAfk($number))
                 $this->wp->sendMessage($number, "*** Seacloud ***\n" . $msg);
         }
     }
@@ -318,6 +323,17 @@ class Seacloud
 
     function IsOp($number)
     {
+    }
+
+    function IsAfk($number)
+    {
+        // If it doesn't exist then simply fucking make it. Bam. Magic.
+        if(!array_key_exists('afk', $this->users[$number]))
+        {
+            $this->users[$number]['afk'] = false;
+        }
+
+        return $this->users[$number]['afk'];
     }
 
 
@@ -377,8 +393,12 @@ class Seacloud
         {
             if($number != $from)
             {
-                $this->wp->sendMessageImage($number, $url, false, $size, $filehash);
-                $this->wp->sendMessage($number, $this->users[$from]['alias'] . " sent an image");
+                // Status checks on the users
+                if(!$this->IsAfk($number))
+                {
+                    $this->wp->sendMessageImage($number, $url, false, $size, $filehash);
+                    $this->wp->sendMessage($number, $this->users[$from]['alias'] . " sent an image");
+                }
             }
         }
 

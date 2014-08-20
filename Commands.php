@@ -14,6 +14,7 @@ class Commands
         $this->RegisterCommand("alias", "Alias", 1);
         $this->RegisterCommand("invite", "Invite", 1);
         $this->RegisterCommand("list", "ListUsers", 0); $this->RegisterCommand("online", "ListUsers", 0);
+        $this->RegisterCommand("afk", "Afk", 0);
     }
 
     function GetCommands()
@@ -85,6 +86,27 @@ class Commands
         }
 
         $sc->SendSystemMessageTo("Online: " . $online, $from);
+    }
+
+    function Afk($sc, $from, $params)
+    {
+        if(array_key_exists('afk', $sc->users[$from]))
+        {
+            if($sc->users[$from]['afk'])
+            {
+                $sc->users[$from]['afk'] = false;
+                $sc->SendSystemMessageTo("You have come back from being afk", $from);
+
+                $sc->BroadcastSystemMessageExcl($sc->users[$from]['alias'] . " has come back from being afk", array($from));
+
+                return;
+            }
+        }
+
+        $sc->users[$from]['afk'] = true;
+        $sc->SendSystemMessageTo("You have gone afk", $from);
+
+        $sc->BroadcastSystemMessageExcl($sc->users[$from]['alias'] . " has gone afk", array($from));
     }
 
     /**
