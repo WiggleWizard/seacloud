@@ -25,14 +25,22 @@ class Commands
 
     function Join($sc, $from, $params)
     {
-        $anonName = "Anon#" . rand(0, 100000);
-        $this->sc->SendSystemMessageTo("You have joined as " . $anonName . ". To change your name use .alias. You can leave at any time by using .leave and if you need to mute the channel simply use .afk", $from);
+        // Dissallow users to be able to join again after they have already joined
+        if(!array_key_exists($from, $this->sc->users))
+        {
+            $anonName = "Anon#" . rand(0, 100000);
+            $this->sc->SendSystemMessageTo("You have joined as " . $anonName . ". To change your name use .alias. You can leave at any time by using .leave and if you need to mute the channel simply use .afk", $from);
 
-        // Insert the user into the 'registered' users array
-        $this->sc->users[(string) $from] = array('alias' => $anonName);
+            // Insert the user into the 'registered' users array
+            $this->sc->users[(string) $from] = array('alias' => $anonName);
 
-        // Breadcast the registration across the channel but exclude the person who joined
-        $this->sc->BroadcastSystemMessageExcl($anonName . " has joined the channel", array($from));
+            // Breadcast the registration across the channel but exclude the person who joined
+            $this->sc->BroadcastSystemMessageExcl($anonName . " has joined the channel", array($from));
+        }
+        else
+        {
+            $this->sc->SendSystemMessageTo("You have already joined this channel, you cannot join again", $from);
+        }
     }
 
     function Ping($sc, $from, $params)
