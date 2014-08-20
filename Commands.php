@@ -26,7 +26,7 @@ class Commands
     function Join($sc, $from, $params)
     {
         $anonName = "Anon#" . rand(0, 100000);
-        $this->sc->SendSystemMessageTo("You have joined as " . $anonName . ". To change your name use .alias", $from);
+        $this->sc->SendSystemMessageTo("You have joined as " . $anonName . ". To change your name use .alias. You can leave at any time by using .leave and if you need to mute the channel simply use .afk", $from);
 
         // Insert the user into the 'registered' users array
         $this->sc->users[(string) $from] = array('alias' => $anonName);
