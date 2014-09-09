@@ -388,7 +388,8 @@ class Seacloud
         $thumbnail // The base64_encode image thumbnail.
     )
     {
-        $from = explode("@", $from)[0];
+        $from = explode("@", $from);
+        $from = $from[0];
 
         // Check if the user has joined, if not then just ignore his ass
         if(!array_key_exists($from, $this->users))
@@ -424,7 +425,8 @@ class Seacloud
         $message // The message.
     )
     {
-        $from = explode("@", $from)[0];
+        $from = explode("@", $from);
+        $from = $from[0];
 
         echo "- ".$name." [" . $from . "] @ ".date('H:i').": ".$message."\n";
 
