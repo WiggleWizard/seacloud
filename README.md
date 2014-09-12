@@ -40,4 +40,4 @@ Sure you can, Seacloud was originally designed to be an anonymous chat channel, 
 It is frowned upon though to modify the code base maliciously and still pass as a Seacloud service.
 
 ###Is there some sort of demo?
-There is a development demo that's up sometimes (It will be up permanently once the project has reached a point in development where persistence is not an issue). You can demo it on this number: `+447745940363`
+There is a development demo that's up sometimes (It will be up permanently once the project has reached a point in development where persistence is not an issue). You can demo it on this number: `+447745940363` (Seacloud is currently bugged, so this number might be intermittently unavailable for now).
